@@ -4,6 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import ApiKeys from "./pages/Keys";
 import Templates from "./pages/Templates";
 import Billing from "./pages/Billing";
+import Playground from "./pages/Playground";
+import ChatPlayground from "./pages/ChatPlayground";
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
           <Link to="/keys">API Keys</Link>
           <Link to="/templates">Templates</Link>
           <Link to="/billing">Billing</Link> {/* 👈 تمت الإضافة */}
+          <Link to="/playground">AI Playground</Link>
+          <Link to="/chat">Chat Playground</Link>
         </nav>
 
         {/* Pages */}
@@ -25,6 +29,8 @@ export default function App() {
             <Route path="/keys" element={<ApiKeys />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/billing" element={<Billing />} />
+            <Route path="/playground" element={<Playground />} />
+            <Route path="/chat" element={<ChatPlayground />} />
 
             {/* Default Route */}
             <Route path="*" element={<Dashboard />} />

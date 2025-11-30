@@ -1,35 +1,50 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { apiRequest } from "../api/client";
 
-export default function Jobs() {
+export default function Dashboard() {
   const [jobs, setJobs] = useState([]);
+  const [adminKey, setAdminKey] = useState("");
 
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/admin/jobs")
-      .then(res => res.json())
-      .then(data => setJobs(data));
-  }, []);
+  const fetchJobs = async () => {
+    try {
+      const data = await apiRequest("/admin/jobs", "GET", null, adminKey);
+      setJobs(data);
+    } catch (err) {
+      alert("Failed to fetch jobs. Check Admin Key.");
+    }
+  };
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">🧠 AI Jobs</h2>
-      <table className="w-full border">
+      <h2 className="text-xl font-bold mb-4">All Jobs</h2>
+
+      <input
+        type="text"
+        className="border p-2 w-full mb-4"
+        placeholder="Enter Admin Key"
+        onChange={(e) => setAdminKey(e.target.value)}
+      />
+
+      <button onClick={fetchJobs} className="bg-blue-600 text-white px-4 py-2 rounded">
+        Load Jobs
+      </button>
+
+      <table className="w-full mt-4 border">
         <thead>
-          <tr className="border-b bg-gray-100">
-            <th className="p-2">ID</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Created At</th>
-            <th className="p-2">Result</th>
+          <tr>
+            <th>Job ID</th>
+            <th>Status</th>
+            <th>API Key</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody>
-          {jobs.map(job => (
-            <tr key={job.id} className="border-b">
-              <td className="p-2">{job.id}</td>
-              <td className="p-2">{job.status}</td>
-              <td className="p-2">{job.created_at}</td>
-              <td className="p-2">
-                {job.result ? JSON.stringify(job.result) : "No result"}
-              </td>
+          {jobs.map((j) => (
+            <tr key={j.id}>
+              <td>{j.id}</td>
+              <td>{j.status}</td>
+              <td>{j.api_key}</td>
+              <td>{j.created_at}</td>
             </tr>
           ))}
         </tbody>
