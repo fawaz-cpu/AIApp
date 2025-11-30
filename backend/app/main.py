@@ -2,13 +2,10 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import APIKeyHeader
-from .routers import process, templates, jobs, api_keys, admin
-
-from .routers import process, templates, jobs, api_keys
-from .db import Base, engine
-
-# 🟢 تعريف Security Scheme علشان يظهر زر Authorize
 from fastapi.openapi.utils import get_openapi
+
+from .routers import process, templates, jobs, api_keys, admin
+from .db import Base, engine
 
 API_KEY_HEADER = APIKeyHeader(name="Authorization", auto_error=False)
 
@@ -20,18 +17,20 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="AI Data Processor - Professional API",
-    lifespan=lifespan
+    lifespan=lifespan,
+    docs_url="/docs",           # ← مهم جداً
+    redoc_url="/redoc",         # ← لواجهة Redoc
+    openapi_url="/openapi.json" # ← رابط وثيقة API
 )
 
-# 🟢 إضافة Routers
+# Routers
 app.include_router(api_keys.router)
 app.include_router(process.router)
 app.include_router(templates.router)
 app.include_router(jobs.router)
 app.include_router(admin.router)
 
-
-# 🟢 Customize OpenAPI to show Authorize button
+# Custom OpenAPI (لتفعيل زر Authorize)
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
