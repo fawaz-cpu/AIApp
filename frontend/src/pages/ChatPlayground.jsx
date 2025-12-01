@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import apiRequest from "../api";
+import { apiRequest } from "../api/client";
+
 
 export default function ChatPlayground() {
   const [apiKey, setApiKey] = useState("");

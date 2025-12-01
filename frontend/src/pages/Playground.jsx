@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import apiRequest from "../api";
+import { apiRequest } from "../api/client";
+
 
 export default function Playground() {
   const [apiKey, setApiKey] = useState("");
