@@ -13,3 +13,5 @@ httpx
 psycopg2-binary
 asyncpg
 python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
