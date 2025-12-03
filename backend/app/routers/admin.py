@@ -4,9 +4,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db import get_db
 from ..models import Job, APIKey
 from sqlalchemy import select
+from ..security.admin_auth import verify_admin_key
+from ..security.user_auth import get_admin_user
+from ..models import User
 
-router = APIRouter(prefix="/admin", tags=["Admin"])
-
+router = APIRouter(
+    prefix="/admin",
+    tags=["Admin"],
+    dependencies=[Depends(get_admin_user)]
+)
 
 @router.get("/jobs")
 async def list_all_jobs(session: AsyncSession = Depends(get_db)):

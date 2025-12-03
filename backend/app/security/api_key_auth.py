@@ -1,7 +1,7 @@
 from fastapi import Header, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from .db import get_db
-from .models import APIKey
+from ..db import get_db
+from ..models import APIKey
 
 async def verify_api_key(
     authorization: str = Header(None),

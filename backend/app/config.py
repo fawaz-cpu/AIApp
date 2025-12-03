@@ -10,6 +10,7 @@ load_dotenv(ENV_PATH)  # تحميل الملف من مساره الصحيح
 # قراءة المتغيرات
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./dev.db")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+ADMIN_KEY = os.getenv("ADMIN_KEY")
 SERVICE_PORT = int(os.getenv("SERVICE_PORT", 8000))
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")

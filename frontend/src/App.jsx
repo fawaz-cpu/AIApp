@@ -10,6 +10,9 @@ import Billing from "./pages/Billing";
 import Playground from "./pages/Playground";
 import ChatPlayground from "./pages/ChatPlayground";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import AdminRoute from "./components/AdminRoute";
+import Signup from "./pages/Signup";
 
 function App() {
   const { lang } = useLang();
@@ -31,6 +34,8 @@ function App() {
           <Route path="/billing" element={<Billing />} />
           <Route path="/ai" element={<Playground />} />
           <Route path="/chat" element={<ChatPlayground />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
     </div>

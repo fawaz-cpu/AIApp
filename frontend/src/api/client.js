@@ -1,5 +1,8 @@
 const API_BASE_URL = "https://aiapp-619q.onrender.com"; // 🔴 غيّرها بالرابط الخاص بك
 
+
+export const ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY;
+
 // ✴️ هذي الدالة الأساسية لتنفيذ جميع الطلبات
 export async function apiRequest(endpoint, method = "GET", body = null, apiKey = null) {
   const headers = {

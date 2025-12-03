@@ -19,7 +19,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 text-sm">
-        <NavItem to="/" label={t("Home", "الرئيسية")}/>
+        <NavItem to="/" label={t("Home", "الرئيسية")} />
         <NavItem to="/Dashboard" label={t("Dashboard", "لوحة التحكم")} />
         <NavItem to="/keys" label={t("API Keys", "مفاتيح الـ API")} />
         <NavItem to="/templates" label={t("Templates", "القوالب")} />
@@ -34,6 +34,12 @@ export default function Sidebar() {
         className="mt-6 w-full rounded-lg bg-[#111827] border border-[#1f2937] py-2 text-xs font-medium text-gray-200 hover:bg-[#1f2937] transition"
       >
         {lang === "en" ? "العربية" : "English"}
+      </button>
+      <button onClick={() => {
+        localStorage.removeItem("access_token");
+        window.location.href = "/login";
+      }}>
+        Logout
       </button>
 
       <p className="mt-3 text-[10px] text-gray-500">

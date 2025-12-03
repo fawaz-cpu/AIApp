@@ -1,75 +1,196 @@
-import React, { useState, useEffect } from "react";
-import { apiRequest } from "../api/client";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { ADMIN_KEY } from "../api/client";
 
-export default function Keys() {
-  const [apiKeys, setApiKeys] = useState([]);
-  const [generatedKey, setGeneratedKey] = useState("");
-  const [masterKey, setMasterKey] = useState(""); // 🟢 Admin key
+const API_BASE = import.meta.env.VITE_API_BASE; // مثال: https://my-backend.onrender.com
 
-  // 🟡 جلب قائمة المفاتيح
-  const fetchKeys = async () => {
+export default function ApiKeys() {
+  const [keys, setKeys] = useState([]);
+  const [owner, setOwner] = useState("");
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // ==========================
+  // جلب كل المفاتيح
+  // ==========================
+  const loadKeys = async () => {
+    setLoading(true);
     try {
-      const data = await apiRequest("/admin/keys", "GET", null, masterKey);
-      setApiKeys(data);
+      const res = await axios.get(`${API_BASE}/admin/keys`, {
+        headers: { "x-admin-key": ADMIN_KEY },
+      });
+      setKeys(res.data);
     } catch (err) {
-      alert("Error fetching keys. Check Admin key.");
+      console.error(err);
+      alert("Error loading keys");
+    }
+    setLoading(false);
+  };
+
+  // ==========================
+  // توليد مفتاح جديد
+  // ==========================
+  const generateKey = async () => {
+    if (!owner) return alert("Please enter owner name");
+
+    try {
+      const res = await axios.post(
+        `${API_BASE}/keys/keys/generate?owner=${owner}`,
+        {},
+        { headers: { "x-admin-key": ADMIN_KEY } }
+      );
+      alert("Key generated: " + res.data.api_key);
+      loadKeys();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate key");
     }
   };
 
-  // 🟢 إنشاء مفتاح جديد
-  const generateKey = async () => {
-    const data = await apiRequest("/keys/keys/generate", "POST", {}, masterKey);
-    setGeneratedKey(data.api_key);
+  // ==========================
+  // تعديل quota
+  // ==========================
+  const updateQuota = async (keyId, quota) => {
+    try {
+      await axios.patch(
+        `${API_BASE}/admin/key/${keyId}`,
+        { quota },
+        { headers: { "x-admin-key": ADMIN_KEY } }
+      );
+      loadKeys();
+    } catch (err) {
+      console.error(err);
+      alert("Failed updating quota");
+    }
   };
 
-  return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">API Keys Management</h2>
+  // ==========================
+  // تفعيل / تعطيل مفتاح
+  // ==========================
+  const toggleKey = async (keyId, active) => {
+    try {
+      await axios.patch(
+        `${API_BASE}/admin/key/${keyId}`,
+        { active },
+        { headers: { "x-admin-key": ADMIN_KEY } }
+      );
+      loadKeys();
+    } catch (err) {
+      console.error(err);
+      alert("Error toggling key");
+    }
+  };
 
-      {/* الإدخال اليدوي للـ Admin Key */}
+  // ==========================
+  // حذف مفتاح
+  // ==========================
+  const deleteKey = async (keyId) => {
+    if (!confirm("Are you sure?")) return;
+
+    try {
+      await axios.delete(`${API_BASE}/admin/key/${keyId}`, {
+        headers: { "x-admin-key": ADMIN_KEY },
+      });
+      loadKeys();
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting key");
+    }
+  };
+
+  useEffect(() => {
+    loadKeys();
+  }, []);
+
+  // فلترة حسب الowner
+  const filteredKeys = keys.filter((k) =>
+    k.owner.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="space-y-6">
+
+      <h1 className="text-3xl font-bold">API Keys Dashboard</h1>
+
+      {/* إضافة مفتاح */}
+      <div className="flex gap-4">
+        <input
+          className="px-3 py-2 bg-gray-800 rounded"
+          placeholder="Owner Name"
+          value={owner}
+          onChange={(e) => setOwner(e.target.value)}
+        />
+        <button
+          onClick={generateKey}
+          className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Generate Key
+        </button>
+      </div>
+
+      {/* بحث */}
       <input
-        type="text"
-        className="border p-2 w-full mb-4"
-        placeholder="Enter your Admin Key"
-        onChange={(e) => setMasterKey(e.target.value)}
+        className="px-3 py-2 bg-gray-800 rounded w-full"
+        placeholder="Search by owner"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
       />
 
-      <button onClick={generateKey} className="bg-blue-500 text-white px-4 py-2 rounded">
-        Generate New Key
-      </button>
-
-      {generatedKey && (
-        <div className="bg-gray-100 p-3 mt-3 rounded">
-          <strong>New API Key:</strong> {generatedKey}
-        </div>
-      )}
-
-      <hr className="my-4" />
-
-      <button onClick={fetchKeys} className="bg-green-500 text-white px-4 py-2 rounded">
-        Load All Keys
-      </button>
-
-      <table className="w-full mt-4 border">
+      {/* جدول عرض المفاتيح */}
+      <table className="w-full text-left mt-4">
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>Quota</th>
+          <tr className="text-gray-300 border-b border-gray-700">
+            <th>Owner</th>
+            <th>Key</th>
             <th>Active</th>
-            <th>Created At</th>
+            <th>Quota</th>
+            <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
-          {apiKeys.map((k) => (
-            <tr key={k.id}>
-              <td>{k.id}</td>
-              <td>{k.quota}</td>
-              <td>{k.active ? "Yes" : "No"}</td>
-              <td>{k.created_at}</td>
+          {filteredKeys.map((k) => (
+            <tr key={k.key} className="border-b border-gray-800">
+              <td>{k.owner}</td>
+              <td className="text-sm text-gray-400">{k.key}</td>
+
+              {/* Active toggle */}
+              <td>
+                <button
+                  className={`px-3 py-1 rounded ${
+                    k.active ? "bg-green-600" : "bg-red-600"
+                  }`}
+                  onClick={() => toggleKey(k.key, !k.active)}
+                >
+                  {k.active ? "Active" : "Disabled"}
+                </button>
+              </td>
+
+              {/* Quota */}
+              <td>
+                <input
+                  className="w-20 bg-gray-800 px-2 py-1 rounded"
+                  type="number"
+                  defaultValue={k.quota}
+                  onBlur={(e) => updateQuota(k.key, Number(e.target.value))}
+                />
+              </td>
+
+              {/* Actions */}
+              <td>
+                <button
+                  className="bg-red-600 px-3 py-1 rounded hover:bg-red-700"
+                  onClick={() => deleteKey(k.key)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {loading && <p>Loading...</p>}
     </div>
   );
 }
