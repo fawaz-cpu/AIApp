@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from ..db import get_db
 from ..models import Template, APIKey
-from ..auth import verify_api_key
+from ..security.api_key_auth import verify_api_key
 
 router = APIRouter(prefix="/v1/templates")
 

@@ -5,7 +5,7 @@ from ..models import Job, Template
 from ..tasks import process_job
 from uuid import uuid4
 import asyncio
-from ..auth import verify_api_key
+from ..security.api_key_auth import verify_api_key
 
 router = APIRouter()
 

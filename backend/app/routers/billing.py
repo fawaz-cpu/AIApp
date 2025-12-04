@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..models import APIKey
 from ..db import get_db
-from ..auth import verify_api_key
+from ..security.api_key_auth import verify_api_key
 from sqlalchemy import select
 from fastapi import HTTPException
 

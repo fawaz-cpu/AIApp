@@ -2,7 +2,7 @@ from fastapi import APIRouter, Header, HTTPException, Depends
 from ..db import AsyncSessionLocal
 from ..models import Job
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..auth import verify_api_key
+from ..security.api_key_auth import verify_api_key
 
 
 router = APIRouter()
