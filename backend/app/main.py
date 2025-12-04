@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import APIKeyHeader
 from fastapi.openapi.utils import get_openapi
-from .security import user_auth
+from fastapi.security import APIKeyHeader
+from .routers import auth
 
-from .routers import process, templates, jobs, api_keys, admin
+from .routers import process, templates, jobs, api_keys, admin, auth
 from .db import Base, engine
+
 
 API_KEY_HEADER = APIKeyHeader(name="Authorization", auto_error=False)
 
@@ -30,7 +31,8 @@ app.include_router(process.router)
 app.include_router(templates.router)
 app.include_router(jobs.router)
 app.include_router(admin.router)
-app.include_router(user_auth.router)
+app.include_router(auth.router)
+
 
 # Custom OpenAPI (لتفعيل زر Authorize)
 def custom_openapi():
