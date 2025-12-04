@@ -4,7 +4,7 @@ from fastapi.security import APIKeyHeader
 
 from .routers import process, templates, jobs, api_keys, admin, auth
 from .db import Base, engine
-
+from . import models  # ✅ تأكد أننا نستورد الموديلز عشان الجداول تنشأ
 
 API_KEY_HEADER = APIKeyHeader(name="Authorization", auto_error=False)
 
@@ -15,24 +15,26 @@ app = FastAPI(
     openapi_url="/openapi.json"
 )
 
-
 # -----------------------------
-# 🚀 مسار مؤقت لإنشاء الجداول
+# 🚀 مسار مؤقت لإنشاء الجداول + إظهار الأخطاء
 # -----------------------------
 @app.get("/__init_db_once__")
 async def init_db_once(secret: str):
-    """
-    مسار لإنشاء الجداول داخل Render.
-    استخدمه مرة واحدة فقط.
-    """
     if secret != "FawazStrongKey2025":
         raise HTTPException(status_code=403, detail="Forbidden")
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        return {"status": "tables created"}
+    except Exception as e:
+        # ⚠️ فقط للتشخيص – رجّع نص الخطأ
+        return {
+            "error": str(e),
+            "type": e.__class__.__name__
+        }
 
-    return {"status": "tables created"}
-
+# ... باقي الكود كما هو (routers + custom_openapi)
 
 # -----------------------------
 # Routers
